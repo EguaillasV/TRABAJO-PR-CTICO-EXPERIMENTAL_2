@@ -1,0 +1,51 @@
+{% extends 'components/base.html' %}
+{% load static %}
+
+{% block title %}Menú Diagnóstico{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
+  <div class="bg-white shadow-xl rounded-3xl max-w-md w-full p-8 space-y-6">
+    
+    <!-- Título con ícono -->
+    <div class="text-center">
+      <svg class="mx-auto w-10 h-10 text-blue-600 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        
+      <h1 class="text-3xl font-extrabold text-blue-700">Menú Diagnóstico</h1>
+    </div>
+
+    <!-- Botón principal -->
+    <a href="{% url 'diagnosticos:create' %}"
+       class="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 rounded-xl shadow transition">
+      <span class="text-2xl">➕</span>
+      <span>Crear Diagnóstico</span>
+    </a>
+
+    <!-- Dos opciones auxiliares en grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="{% url 'diagnosticos:list' %}"
+         class="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-500 to-green-300 hover:from-green-600 hover:to-green-400 text-white font-medium py-3 rounded-xl shadow transition">
+        <span>📋</span>
+        <span>Ver Diagnósticos</span>
+      </a>
+      <a href="{% url 'pacientes:list' %}"
+         class="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-500 to-purple-300 hover:from-purple-600 hover:to-purple-400 text-white font-medium py-3 rounded-xl shadow transition">
+        <span>👨‍⚕️</span>
+        <span>Ver Pacientes</span>
+      </a>
+    </div>
+
+    <!-- Enlace de volver -->
+    <div class="text-center">
+      <a href="{% url 'module_list' %}"
+         class="inline-flex items-center text-sm text-gray-600 hover:text-gray-800 transition">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Volver
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

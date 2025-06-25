@@ -1,0 +1,19 @@
+{% extends 'home.html' %}
+{% block title %}Eliminar Usuario{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 bg-red-900 p-8 rounded-xl shadow-lg text-black">
+  <h2 class="text-2xl font-bold text-center mb-6">⚠️ Confirmar eliminación</h2>
+  
+  <p class="text-center text-lg mb-8">
+    ¿Estás seguro que deseas eliminar al usuario 
+    <span class="font-semibold underline">{{ object.get_full_name|default:object.email }}</span>?
+  </p>
+
+  <form method="post" class="flex justify-center gap-4">
+    {% csrf_token %}
+    <button type="submit" class="bg-red-700 hover:bg-red-700 px-5 py-2 rounded-lg shadow">🗑️ Eliminar</button>
+    <a href="{% url 'security:user_list' %}" class="bg-blue-600 hover:bg-gray-700 px-5 py-2 rounded-lg shadow">↩️ Cancelar</a>
+  </form>
+</div>
+{% endblock %}

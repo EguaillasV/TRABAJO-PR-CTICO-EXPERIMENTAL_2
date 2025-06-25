@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+  <!-- Encabezado con título y botones -->
+  <div class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+    <h2 class="text-2xl font-bold text-gray-800">Diagnósticos</h2>
+
+    <div class="flex space-x-2">
+      <!-- Botón volver a Home -->
+      <a href="{% url 'diagnosticos:module_list' %}"
+         class="px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-400 transition">
+        ← Inicio
+      </a>
+
+      <!-- Botón Nuevo Diagnóstico -->
+      <a href="{% url 'diagnosticos:create' %}"
+         class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+        ➕ Nuevo Diagnóstico
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabla de diagnósticos -->
+  <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            Descripción
+          </th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for d in diagnosticos %}
+        <tr class="hover:bg-gray-100">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+            {{ d }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+            <a href="{% url 'diagnosticos:update' d.pk %}" class="text-blue-600 hover:text-blue-800">
+              ✏️ Editar
+            </a>
+            <a href="{% url 'diagnosticos:delete' d.pk %}" class="text-red-600 hover:text-red-800">
+              🗑️ Eliminar
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500">
+            No hay diagnósticos registrados.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

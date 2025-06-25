@@ -1,0 +1,102 @@
+{% extends 'home.html' %}
+{% block title %}Listado de Grupos{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-indigo-100 py-8 px-4">
+  <div class="w-full max-w-5xl">
+    <h2 class="text-3xl font-extrabold text-center text-white bg-indigo-500 py-4 rounded-lg mb-6 shadow">
+      LISTADO DE GRUPOS
+    </h2>
+
+    <!-- Buscador centrado -->
+    <div class="flex justify-center mb-6">
+      <input type="text" placeholder="🔎 Buscar grupo..." class="w-full max-w-md px-4 py-2 rounded shadow border text-center text-black bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+    </div>
+    
+
+    <!-- Tabla de grupos -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-12">#</th>
+              <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-12">
+                <i class="fas fa-users"></i>
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider min-w-0">Nombre</th>
+              <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell w-20">Usuarios</th>
+              <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell w-20">Módulos</th>
+              <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden xl:table-cell w-20">Permisos</th>
+              <th class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-20">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for group in groups %}
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                <td class="px-2 py-2 text-sm text-gray-900 dark:text-gray-300">{{ group.id }}</td>
+                <td class="px-2 py-2">
+                  <div class="flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded">
+                    <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xs"></i>
+                  </div>
+                </td>
+                <td class="px-3 py-2">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-32">
+                    {{ group.name }}
+                  </div>
+                </td>
+                <td class="px-2 py-2 hidden md:table-cell text-center text-sm text-white">
+                  {{ group.user_count }}
+                </td>
+                <td class="px-2 py-2 hidden lg:table-cell text-center text-sm text-white">
+                  <!-- Placeholder módulos -->
+                  {{ group.modules|default:"-" }}
+                </td>
+                <td class="px-2 py-2 hidden xl:table-cell text-center text-sm text-white">
+                  <!-- Placeholder permisos -->
+                  {{ group.permisos|default:"-" }}
+                </td>
+                
+                <td class="px-2 py-2 text-center space-x-3">
+                  <a href="{% url 'security:group_update' group.id %}" class="text-yellow-400 hover:text-yellow-300">
+                  <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{% url 'security:group_delete' group.id %}" class="text-red-500 hover:text-red-400">
+                  <i class="fas fa-trash-alt"></i>
+                    </a>
+                   </td>
+
+              </tr>
+            {% endfor %}
+            <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector("input[type='text']");
+    const rows = document.querySelectorAll("tbody tr");
+
+    searchInput.addEventListener("keyup", function () {
+      const filter = this.value.toLowerCase();
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+  });
+</script>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Botón de nuevo grupo -->
+    <div class="flex justify-center mt-8">
+      <a href="{% url 'security:group_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full shadow-md transition">
+        ➕ Nuevo Grupo
+      </a>
+      <a href="{% url 'home' %}" class="bg-blue-600 hover:bg-gray-600 text-black font-semibold px-6 py-3 rounded-full shadow-md transition text-center">
+    ↩ Volver
+  </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

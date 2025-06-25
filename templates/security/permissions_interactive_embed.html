@@ -1,0 +1,45 @@
+<!-- Contenido desplegable -->
+<div x-data="permisoPanel()" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-blue-100">
+  <!-- Botón desplegable -->
+  <button @click="open = !open" class="w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-lg hover:from-blue-600 transition-all">
+    <span>🔐 Asignar Permisos</span>
+    <svg :class="{ 'rotate-180': open }" class="h-5 w-5 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Contenido desplegable sin scroll -->
+  <div x-show="open" x-transition.duration.300ms class="max-h-[1000px] transition-all ease-in-out overflow-hidden">
+    <div class="p-6 bg-gradient-to-br from-blue-50 to-white space-y-6">
+      <h2 class="text-2xl font-semibold text-blue-700 text-center">Gestión Interactiva de Permisos</h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="group-select" class="block text-sm font-medium text-gray-700 mb-1">Selecciona un Grupo:</label>
+          <select id="group-select" class="w-full rounded-xl border-gray-300 shadow-sm px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="">-- Seleccione --</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="module-select" class="block text-sm font-medium text-gray-700 mb-1">Selecciona un Módulo:</label>
+          <select id="module-select" class="w-full rounded-xl border-gray-300 shadow-sm px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="">-- Seleccione --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="permissions-container" class="hidden mt-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Permisos Disponibles:</h3>
+        <form id="permissions-form" class="space-y-2"></form>
+        <button @click.prevent="reiniciarFormulario()" id="save-permissions" class="...">
+            💾 Guardar Permisos
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alpine y script -->
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script src="{% static 'js/permissions_interactive.js' %}"></script>

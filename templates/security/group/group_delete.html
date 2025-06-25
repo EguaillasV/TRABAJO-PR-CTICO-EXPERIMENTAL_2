@@ -1,0 +1,31 @@
+{% extends 'home.html' %}
+{% block title %}Eliminar Grupo{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-8">
+    <h2 class="text-2xl font-bold text-center mb-6 text-red-700">¿Estás seguro que deseas eliminar este grupo?</h2>
+    <form method="post" class="bg-white p-6 rounded-lg shadow space-y-6">
+        {% csrf_token %}
+        <p class="text-center text-lg text-gray-800">
+            Grupo: <strong>{{ object.name }}</strong>
+        </p>
+        <div class="flex justify-center gap-4">
+            <button type="submit" class="bg-blue-600 hover:bg-red-700 text-black px-6 py-2 rounded-lg shadow">
+                ✅ Confirmar Eliminación
+            </button>
+            <a href="{% url 'security:group_list' %}" class="bg-blue-600 hover:bg-gray-600 text-black px-6 py-2 rounded-lg shadow">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% if protected_error %}
+<div class="bg-red-100 text-red-800 px-4 py-3 rounded mb-4">
+  ⚠️ No se puede eliminar este grupo porque tiene permisos asignados. Elimínalos primero desde "Gestionar Permisos".
+</div>
+<a href="{% url 'security:permissions_interactive' %}?group_id={{ object.id }}" class="bg-purple-600 text-white px-4 py-2 rounded">Gestionar Permisos</a>
+<a href="{% url 'security:group_list' %}" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded">Volver</a>
+{% else %}
+<!-- Formulario normal de confirmación -->
+{% endif %}
+{% endblock %}
