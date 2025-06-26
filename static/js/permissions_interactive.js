@@ -1,116 +1,120 @@
-const groupSelect = document.getElementById("group-select");
-const moduleSelect = document.getElementById("module-select");
+const groupSelect         = document.getElementById("group-select");
+const moduleSelect        = document.getElementById("module-select");
 const permissionsContainer = document.getElementById("permissions-container");
-const permissionsForm = document.getElementById("permissions-form");
-const saveButton = document.getElementById("save-permissions");
+const permissionsForm     = document.getElementById("permissions-form");
+const saveButton          = document.getElementById("save-permissions");
 
-// Cargar grupos
-fetch("/auth/api/groups/")
-  .then(res => res.json())
-  .then(data => {
-    data.forEach(group => {
-      const option = document.createElement("option");
-      option.value = group.id;
-      option.textContent = group.name;
-      groupSelect.appendChild(option);
+document.addEventListener("DOMContentLoaded", () => {
+  // 1) Cargar grupos
+  fetch("/auth/api/groups/")
+    .then(res => res.json())
+    .then(groups => {
+      groups.forEach(g => {
+        const opt = document.createElement("option");
+        opt.value = g.id;
+        opt.textContent = g.name;
+        groupSelect.appendChild(opt);
+      });
     });
+
+  // 2) Cambiar grupo → recargar módulos
+  groupSelect.addEventListener("change", () => {
+    const gid = groupSelect.value;
+    moduleSelect.innerHTML = '<option value="">-- Seleccione --</option>';
+    permissionsForm.innerHTML = "";
+    permissionsContainer.classList.add("hidden");
+    if (!gid) return;
+
+    fetch(`/auth/api/modules/${gid}/`)
+      .then(res => res.json())
+      .then(mods => {
+        mods.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.module_id;
+          opt.textContent = m.module_name;
+          moduleSelect.appendChild(opt);
+        });
+      });
   });
 
-// Al seleccionar grupo, cargar módulos
-groupSelect.addEventListener("change", () => {
-  const groupId = groupSelect.value;
-  moduleSelect.innerHTML = '<option value="">-- Seleccione --</option>';
-  permissionsContainer.classList.add("hidden");
+  // 3) Cambiar módulo → recargar permisos (todos) y marcar los asignados
+  moduleSelect.addEventListener("change", () => {
+    const gid = groupSelect.value;
+    const mid = moduleSelect.value;
+    permissionsForm.innerHTML = "";
+    permissionsContainer.classList.add("hidden");
+    if (!gid || !mid) return;
 
-  if (!groupId) return;
+    fetch(`/auth/api/permissions/${gid}/${mid}/`)
+      .then(res => res.json())
+      .then(perms => {
+        if (!perms.length) {
+          permissionsForm.innerHTML = "<p class='text-sm text-gray-500'>No hay permisos en este módulo.</p>";
+        } else {
+          perms.forEach(p => {
+            const row = document.createElement("div");
+            row.className = "flex items-center space-x-2";
 
-  fetch(`/auth/api/modules/${groupId}/`)
-    .then(res => res.json())
-    .then(modules => {
-      modules.forEach(mod => {
-        const option = document.createElement("option");
-        option.value = mod.module_id;
-        option.textContent = mod.module_name;
-        moduleSelect.appendChild(option);
+            const cb = document.createElement("input");
+            cb.type    = "checkbox";
+            cb.value   = p.id;
+            cb.checked = p.assigned;            // ← marcamos los asignados
+            cb.classList.add("mr-2");
+
+            const lbl = document.createElement("label");
+            lbl.textContent = p.name;
+
+            row.append(cb, lbl);
+            permissionsForm.append(row);
+          });
+        }
+        permissionsContainer.classList.remove("hidden");
       });
-    });
-});
+  });
 
-// Al seleccionar módulo, cargar permisos
-moduleSelect.addEventListener("change", () => {
-  const groupId = groupSelect.value;
-  const moduleId = moduleSelect.value;
-  permissionsForm.innerHTML = "";
-  permissionsContainer.classList.add("hidden");
+  // 4) Guardar permisos
+  saveButton.addEventListener("click", () => {
+    const gid = groupSelect.value;
+    const mid = moduleSelect.value;
+    if (!gid || !mid) return;
 
-  if (!groupId || !moduleId) return;
-
-  fetch(`/auth/api/permissions/${groupId}/${moduleId}/`)
-    .then(res => res.json())
-    .then(perms => {
-      perms.forEach(perm => {
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.name = "permissions";
-        checkbox.value = perm.id;
-        checkbox.checked = perm.assigned;
-        checkbox.classList.add("mr-2");
-
-        const label = document.createElement("label");
-        label.classList.add("flex", "items-center", "space-x-2");
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(perm.name));
-
-        permissionsForm.appendChild(label);
-      });
-
-      permissionsContainer.classList.remove("hidden");
-    });
-});
-
-// Función pura JS para limpiar el formulario
-function limpiarFormulario() {
-  // Reiniciar selects y ocultar permisos
-  groupSelect.selectedIndex = 0;
-  moduleSelect.innerHTML = '<option value="">-- Seleccione --</option>';
-  permissionsForm.innerHTML = '';
-  permissionsContainer.classList.add('hidden');
-}
-
-// Guardar permisos
-saveButton.addEventListener("click", () => {
-  const groupId = groupSelect.value;
-  const moduleId = moduleSelect.value;
-  const checked = [...permissionsForm.querySelectorAll("input[type='checkbox']")]
+    const selected = Array.from(
+      permissionsForm.querySelectorAll("input[type='checkbox']")
+    )
     .filter(cb => cb.checked)
     .map(cb => cb.value);
 
-  fetch("/auth/api/save_permissions/", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCSRFToken(),
-    },
-    body: JSON.stringify({
-      group_id: groupId,
-      module_id: moduleId,
-      permissions: checked,
-    }),
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Permisos guardados correctamente.");
-      // Reinicia el formulario con JS puro
+    fetch("/auth/api/save_permissions/", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(),
+      },
+      body: JSON.stringify({
+        group_id: gid,
+        module_id: mid,
+        permission_ids: selected
+      }),
+    })
+    .then(r => r.json())
+    .then(js => {
+      alert(js.message || "Permisos guardados correctamente.");
       limpiarFormulario();
     });
+  });
 });
+
+function limpiarFormulario() {
+  groupSelect.selectedIndex = 0;
+  moduleSelect.innerHTML    = '<option value="">-- Seleccione --</option>';
+  permissionsForm.innerHTML = "";
+  permissionsContainer.classList.add("hidden");
+}
 
 function getCSRFToken() {
   const name = "csrftoken";
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    const [key, value] = cookie.trim().split("=");
-    if (key === name) return decodeURIComponent(value);
-  }
+  return document.cookie.split(";")
+    .map(c => c.trim().split("="))
+    .find(([k]) => k === name)?.[1] || "";
 }
